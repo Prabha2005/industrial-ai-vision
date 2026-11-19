@@ -8,7 +8,10 @@ from industrial_vision.detector import (
     filter_detections_by_confidence,
     non_max_suppression,
 )
-from industrial_vision.video_inference import process_video
+from industrial_vision.video_inference import (
+    _validate_video_paths,
+    process_video,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
@@ -93,6 +96,10 @@ def main() -> None:
             parser.error(
                 "--tracking-confidence-threshold requires --tracking"
             )
+        detector = None
+
+    _validate_video_paths(args.input_video, args.output_video)
+    if not args.tracking:
         detector = YoloDetector(checkpoint=str(args.checkpoint))
 
     summary = process_video(

@@ -10,6 +10,33 @@ from industrial_vision.image_processing import (
     threshold_image,
 )
 
+IMAGE_PROCESSORS = [
+    pytest.param(lambda image: resize_image(image, width=4), id="resize"),
+    pytest.param(lambda image: apply_gaussian_blur(image), id="gaussian-blur"),
+    pytest.param(lambda image: threshold_image(image), id="threshold"),
+    pytest.param(
+        lambda image: annotate_image(image, (0, 0, 2, 2), "object"),
+        id="annotate",
+    ),
+]
+
+
+@pytest.mark.parametrize("process_image", IMAGE_PROCESSORS)
+def test_image_processing_accepts_uint8_input(process_image):
+    image = np.zeros((4, 4, 3), dtype=np.uint8)
+
+    processed = process_image(image)
+
+    assert processed.dtype == np.uint8
+
+
+@pytest.mark.parametrize("process_image", IMAGE_PROCESSORS)
+def test_image_processing_rejects_float32_input(process_image):
+    image = np.zeros((4, 4, 3), dtype=np.float32)
+
+    with pytest.raises(TypeError, match="dtype uint8"):
+        process_image(image)
+
 
 def test_load_image_reads_color_image(tmp_path):
     source = np.full((12, 20, 3), 80, dtype=np.uint8)

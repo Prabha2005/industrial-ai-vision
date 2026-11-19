@@ -113,13 +113,18 @@ def _class_name(
 
 
 def _tracking_id(value: np.generic) -> int | None:
-    try:
-        numeric_id = float(value)
-    except (OverflowError, TypeError, ValueError):
+    if isinstance(value, (bool, np.bool_)):
         return None
-    if not math.isfinite(numeric_id) or not numeric_id.is_integer():
+
+    if isinstance(value, Integral):
+        tracking_id = int(value)
+    elif isinstance(value, Real):
+        if not np.isfinite(value) or value != np.floor(value):
+            return None
+        tracking_id = int(value)
+    else:
         return None
-    tracking_id = int(numeric_id)
+
     return tracking_id if tracking_id >= 0 else None
 
 

@@ -214,6 +214,21 @@ def test_byte_track_converts_boxes_and_tracking_ids_to_project_models():
     ]
 
 
+def test_byte_track_preserves_large_unsigned_integer_tracking_id():
+    large_tracking_id = np.uint64(9007199254740993)
+    result = make_track_result(
+        xyxy=[[1, 2, 30, 40]],
+        class_ids=[0],
+        confidences=[0.9],
+        tracking_ids=[large_tracking_id],
+    )
+    tracker = ByteTrackTracker(model_factory=lambda _: FakeTrackModel([[result]]))
+
+    tracked = tracker.track(np.zeros((50, 50, 3), dtype=np.uint8))
+
+    assert tracked[0].tracking_id == 9007199254740993
+
+
 def test_byte_track_accepts_sequence_class_names():
     result = make_track_result(
         xyxy=[[1, 2, 30, 40]],
@@ -246,10 +261,16 @@ def test_byte_track_returns_empty_for_no_results_or_missing_tracking_ids():
 
 def test_byte_track_skips_invalid_ids_without_inventing_replacements():
     result = make_track_result(
-        xyxy=[[1, 2, 30, 40], [2, 3, 31, 41], [3, 4, 32, 42]],
-        class_ids=[0, 0, 0],
-        confidences=[0.9, 0.8, 0.7],
-        tracking_ids=[12, np.nan, -1],
+        xyxy=[
+            [1, 2, 30, 40],
+            [2, 3, 31, 41],
+            [3, 4, 32, 42],
+            [4, 5, 33, 43],
+            [5, 6, 34, 44],
+        ],
+        class_ids=[0, 0, 0, 0, 0],
+        confidences=[0.9, 0.8, 0.7, 0.6, 0.5],
+        tracking_ids=[12, np.nan, -1, np.inf, 1.5],
     )
     tracker = ByteTrackTracker(model_factory=lambda _: FakeTrackModel([[result]]))
 

@@ -1,8 +1,9 @@
 # Industrial AI Vision
 
-A software-only industrial computer vision learning project. It uses public
-datasets, prerecorded media, and optionally a webcam; it does not claim
-deployment on physical edge hardware.
+A software-only industrial computer vision learning project. It currently
+demonstrates pretrained YOLO inference on images and prerecorded videos.
+Webcam capture, dataset training, and region-based counting are not implemented.
+The project does not claim deployment on physical edge hardware.
 
 ## Milestone 1: OpenCV fundamentals
 
@@ -91,6 +92,13 @@ The frame-by-frame pipeline keeps only the current frame in memory. Video
 dimensions come from the first decoded frame; a valid source FPS is preserved,
 otherwise output uses 30 FPS. Output supports `.mp4` and `.avi`, subject to
 available OpenCV codecs.
+
+OpenCV's `VideoCapture.read()` reports whether a frame was returned, but its
+generic API does not reliably distinguish normal end-of-file from a decoding or
+read failure across video backends. Accordingly, a failed read after processing
+starts is treated as end-of-input. A truncated or damaged video may therefore
+produce a partial output without a decoding error; the reported frame count is
+the number of frames actually processed, not a validation of video completeness.
 
 ### Detection-only mode
 

@@ -87,6 +87,33 @@ def _validate_unit_interval(value: object, field_name: str) -> float:
     return normalized
 
 
+def _validate_video_paths(
+    input_path: str | Path,
+    output_path: str | Path,
+) -> tuple[Path, Path, str]:
+    source = Path(input_path)
+    if not source.exists():
+        raise FileNotFoundError(f"Video file does not exist: {source}")
+    if not source.is_file():
+        raise ValueError(f"Input path is not a video file: {source}")
+
+    destination = Path(output_path)
+    codec_name = OUTPUT_CODECS.get(destination.suffix.lower())
+    if codec_name is None:
+        raise ValueError("output_path must have an .mp4 or .avi extension")
+    if source.resolve() == destination.resolve():
+        raise ValueError("input and output video paths must be different")
+    if destination.exists() and destination.is_dir():
+        raise ValueError(f"Output path is a directory: {destination}")
+    try:
+        destination.parent.mkdir(parents=True, exist_ok=True)
+    except OSError as error:
+        raise OSError(
+            f"Could not create output directory: {destination.parent}"
+        ) from error
+    return source, destination, codec_name
+
+
 def _validate_frame(frame: object, expected_size: FrameSize | None = None) -> Image:
     if not isinstance(frame, np.ndarray):
         raise TypeError("video frames must be NumPy arrays")
@@ -201,26 +228,10 @@ def process_video(
         filter_detections_by_confidence((), effective_confidence_threshold)
         non_max_suppression((), effective_iou_threshold)
 
-    source = Path(input_path)
-    if not source.exists():
-        raise FileNotFoundError(f"Video file does not exist: {source}")
-    if not source.is_file():
-        raise ValueError(f"Input path is not a video file: {source}")
-
-    destination = Path(output_path)
-    codec_name = OUTPUT_CODECS.get(destination.suffix.lower())
-    if codec_name is None:
-        raise ValueError("output_path must have an .mp4 or .avi extension")
-    if source.resolve() == destination.resolve():
-        raise ValueError("input and output video paths must be different")
-    if destination.exists() and destination.is_dir():
-        raise ValueError(f"Output path is a directory: {destination}")
-    try:
-        destination.parent.mkdir(parents=True, exist_ok=True)
-    except OSError as error:
-        raise OSError(
-            f"Could not create output directory: {destination.parent}"
-        ) from error
+    source, destination, codec_name = _validate_video_paths(
+        input_path,
+        output_path,
+    )
 
     if not tracking and detector is None:
         detector = YoloDetector()

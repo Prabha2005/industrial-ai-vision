@@ -14,6 +14,8 @@ Color = tuple[int, int, int]
 def _validate_image(image: Image) -> None:
     if not isinstance(image, np.ndarray):
         raise TypeError("image must be a NumPy array")
+    if image.dtype != np.uint8:
+        raise TypeError("image must have dtype uint8")
     if image.size == 0 or image.ndim not in (2, 3):
         raise ValueError("image must be a non-empty grayscale or color array")
     if image.ndim == 3 and image.shape[2] not in (1, 3, 4):
