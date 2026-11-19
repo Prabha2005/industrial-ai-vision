@@ -1,0 +1,77 @@
+# Python environments and generated package files
+/.venv/
+/venv/
+/env/
+/ENV/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Test and coverage artifacts
+.coverage
+.coverage.*
+htmlcov/
+
+# Downloaded model checkpoints and exported models
+/models/weights/
+*.pt
+*.pth
+*.onnx
+*.engine
+*.tflite
+*.safetensors
+*.ckpt
+*.weights
+*.model
+*.gguf
+*.ggml
+
+# Local video samples and dataset directories (keep source and documentation)
+/data/**/*.mp4
+/data/**/*.avi
+/data/**/*.mov
+/data/**/*.mkv
+/data/**/*.m4v
+/data/**/*.wmv
+/data/**/*.webm
+/data/**/*.mpg
+/data/**/*.mpeg
+/data/**/*.ts
+/data/**/*.3gp
+/data/samples/bus.jpg
+/data/raw/
+/data/processed/
+/data/external/
+/data/datasets/
+
+# Generated inference results
+/outputs/
+
+# Secrets and local credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+id_rsa
+id_ed25519
+id_ecdsa
+
+# Temporary files and logs
+*.tmp
+*.temp
+*.log
+*.bak
+*.swp
+*.swo
+
+# Operating-system files
+.DS_Store
+Thumbs.db
+Desktop.ini
